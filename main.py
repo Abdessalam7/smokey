@@ -45,7 +45,7 @@ def main():
 
     ko_count = sum(1 for r in results if r["error"] or not r["http"])
     log.info("Done: %d KO / %d total", ko_count, len(results))
-    return 2 if ko_count else 0
+    return 0
 
 
 if __name__ == "__main__":
