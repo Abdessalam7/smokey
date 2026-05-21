@@ -39,6 +39,7 @@ def main():
         endpoint=config.COS_ENDPOINT,
         access_key=config.COS_ACCESS_KEY_ID,
         secret_key=config.COS_SECRET_ACCESS_KEY,
+        region=config.COS_REGION,
     )
     log.info("Uploaded to s3://%s/%s", config.COS_BUCKET, config.COS_OBJECT_KEY)
 
