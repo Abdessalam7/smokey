@@ -6,26 +6,15 @@ from datetime import datetime, timezone
 
 import config
 import cos
-from airflow.airflow_check import check_all
-from instances import build_instances
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("pysmoke-test")
 
 
-def main():
-    log.info("Starting %s smoke tests (target=%s, env_list=%s)",
-             config.SERVICE, config.TARGET, config.ENV_LIST)
-
-    instances_config = config.load_instances_config()
-    instances = build_instances(instances_config, config.ENV_LIST)
-    log.info("Built %d instances", len(instances))
-
-    results = check_all(instances, timeout=config.HTTP_TIMEOUT)
-
+def _write_and_upload(results, results_key):
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00"),
-        "instances": results,
+        results_key: results,
     }
 
     with open(config.LOCAL_OUTPUT_PATH, "w", encoding="utf-8") as f:
@@ -43,8 +32,43 @@ def main():
     )
     log.info("Uploaded to s3://%s/%s", config.COS_BUCKET, config.COS_OBJECT_KEY)
 
+
+def run_airflow():
+    from airflow.airflow_check import check_all
+    from instances import build_instances
+
+    instances_config = config.load_instances_config()
+    instances = build_instances(instances_config, config.ENV_LIST)
+    log.info("Built %d instances", len(instances))
+
+    results = check_all(instances, timeout=config.HTTP_TIMEOUT)
+    _write_and_upload(results, "instances")
+
     ko_count = sum(1 for r in results if r["error"] or not r["http"])
     log.info("Done: %d KO / %d total", ko_count, len(results))
+
+
+def run_spark():
+    from spark_auth import get_spark_token
+    from spark_check import get_tenants
+
+    token = get_spark_token(config.TARGET, timeout=config.HTTP_TIMEOUT)
+    results = get_tenants(config.TARGET, token, config.ENV_LIST, timeout=config.HTTP_TIMEOUT)
+    _write_and_upload(results, "tenants")
+
+    ko_count = sum(1 for r in results if not r["all_healthy"])
+    log.info("Done: %d KO / %d total", ko_count, len(results))
+
+
+def main():
+    log.info("Starting %s smoke tests (target=%s, env_list=%s)",
+             config.SERVICE, config.TARGET, config.ENV_LIST)
+
+    if config.SERVICE == "spark":
+        run_spark()
+    else:
+        run_airflow()
+
     return 0
 
 
