@@ -17,6 +17,15 @@ COS_ACCESS_KEY_ID = os.getenv("COS_ACCESS_KEY_ID", "")
 COS_SECRET_ACCESS_KEY = os.getenv("COS_SECRET_ACCESS_KEY", "")
 COS_OBJECT_KEY = os.getenv("COS_OBJECT_KEY", f"monitoring-web/input/{SERVICE}/status.json")
 
+BASE_DOMAIN = ".data.cloud.net.intra"
+
+# Spark (Vault mTLS + OIDC client-credentials, mirrors the Airflow vault_helper)
+VAULT_NS = os.getenv("VAULT_NS", "")
+VAULT_URL = os.getenv("VAULT_URL", "")
+VAULT_CLIENT_CERT = os.getenv("VAULT_CLIENT_CERT", "/client-cert/tls.crt")
+VAULT_CLIENT_KEY = os.getenv("VAULT_CLIENT_KEY", "/client-cert/tls.key")
+EXCLUDED_CLUSTERS = [c.strip() for c in os.getenv("EXCLUDED_CLUSTERS", "").split(",") if c.strip()]
+
 
 def load_instances_config():
     with open(INSTANCES_CONFIG_PATH, "r", encoding="utf-8") as f:
