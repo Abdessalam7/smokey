@@ -1,2 +1,8 @@
-kubectl get configmap pysmoke-test-pysmoke-instances -n monitoring-datahub-v2 \
-  -o jsonpath='{.data.instances\.json}' | python3 -m json.tool > instances.json
+kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -text | grep -A2 "Not Before"
+
+kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -text | grep -A3 "X509v3 Key Usage"
+
+kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -text | grep -A3 "X509v3 Extended Key Usage"
