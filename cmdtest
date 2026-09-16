@@ -1,8 +1,23 @@
-kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
-  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -text | grep -A2 "Not Before"
+# 1. Activer le moteur PKI
+vault secrets enable -namespace="a101731" -path=pkis/pysmoke-test pki
 
-kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
-  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -text | grep -A3 "X509v3 Key Usage"
+# 2. Durée de vie max des certs émis (ex: 1 an pour la CA racine)
+vault secrets tune -namespace="a101731" -max-lease-ttl=87600h pkis/pysmoke-test
 
-kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
-  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -text | grep -A3 "X509v3 Extended Key Usage"
+# 3. Générer une CA racine interne
+vault write -namespace="a101731" pkis/pysmoke-test/root/generate/internal \
+  common_name="pysmoke-test CA" \
+  ttl=87600h
+
+# 4. Créer un rôle d'émission (autorise les CN sous ce pattern, avec client auth)
+vault write -namespace="a101731" pkis/pysmoke-test/roles/pysmoke-spark \
+  allowed_domains="data.cloud.net.intra" \
+  allow_subdomains=true \
+  client_flag=true \
+  server_flag=false \
+  max_ttl="720h"
+
+# 5. Émettre le certificat client pour Spark
+vault write -namespace="a101731" pkis/pysmoke-test/issue/pysmoke-spark \
+  common_name="pysmoke-test-spark.data.cloud.net.intra" \
+  ttl="720h"
