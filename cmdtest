@@ -1,0 +1,2 @@
+kubectl get configmap pysmoke-test-pysmoke-instances -n monitoring-datahub-v2 \
+  -o jsonpath='{.data.instances\.json}' | python3 -m json.tool > instances.json
