@@ -1,17 +1,3 @@
-vault write -namespace="a101731" -format=json pkis/pysmoke-test/issue/pysmoke-spark \
-  common_name="pysmoke-test-spark.data.cloud.net.intra" \
-  ttl="720h" > /tmp/spark-cert.json
-
-jq -r '.data.certificate' /tmp/spark-cert.json > /tmp/tls.crt
-jq -r '.data.private_key' /tmp/spark-cert.json > /tmp/tls.key
-jq -r '.data.issuing_ca' /tmp/spark-cert.json > /tmp/ca.pem
-
-
-kubectl create secret tls pysmoke-test-spark-vault-cert \
-  -n monitoring-datahub-v2 \
-  --cert=/tmp/tls.crt \
-  --key=/tmp/tls.key
-
 vault write -namespace="a101731" auth/cert/certs/pysmoke-test-spark \
   display_name=pysmoke-test-spark \
   policies=pysmoke-test-spark \
