@@ -1,13 +1,5 @@
-# Policy : autorise uniquement l'émission de certs via ce rôle PKI précis
-vault policy write -namespace="a101731" pysmoke-spark-pki-issue - <<'EOF'
-path "pkis/pysmoke-test/issue/pysmoke-spark" {
-  capabilities = ["create", "update"]
-}
-EOF
-
-# Rôle d'auth Kubernetes, lié au ServiceAccount `pysmoke` de ton namespace K8s
-vault write -namespace="a101731" auth/kubernetes/role/pysmoke-cert-renewer \
-  bound_service_account_names=pysmoke \
-  bound_service_account_namespaces=monitoring-datahub-v2 \
-  policies=pysmoke-spark-pki-issue \
-  ttl=1h
+vault write -namespace="a101731" auth/cert/certs/pysmoke-test-spark \
+  display_name=pysmoke-test-spark \
+  policies=pysmoke-test-spark,pysmoke-spark-pki-issue \
+  allowed_common_names=pysmoke-test-spark.data.cloud.net.intra \
+  certificate=@/tmp/ca.pem
