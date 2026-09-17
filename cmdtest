@@ -1,4 +1,1 @@
-kubectl get cronjob pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 -o yaml | grep -A1 ENV_LIST
-
-kubectl create job --from=cronjob/pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 verify-fix
-kubectl logs -f job/verify-fix -n monitoring-datahub-v2
+grep -n -B3 -A1 "ENV_LIST" pysmoke-ns/templates/cronjob-spark.yaml
