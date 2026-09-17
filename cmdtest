@@ -1,1 +1,4 @@
-grep -n -B3 -A1 "ENV_LIST" pysmoke-ns/templates/cronjob-spark.yaml
+
+helm get manifest pysmoke-test -n monitoring-datahub-v2 | grep -B5 -A1 ENV_LIST
+
+kubectl edit cronjob pysmoke-test-pysmoke-spark -n monitoring-datahub-v2
