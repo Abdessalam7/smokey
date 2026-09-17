@@ -7,3 +7,6 @@ command: ["sleep", "3600"]
 kubectl apply -f /tmp/debug-job.yaml
 
 kubectl exec -it job/debug-spark -n monitoring-datahub-v2 -- sh
+
+curl -v --max-time 15 https://spark-cp-hprd.data.cloud.net.intra/api/spark/v1/instances \
+  -H "Authorization: Bearer $TOKEN"
