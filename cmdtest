@@ -1,4 +1,3 @@
-kubectl create secret generic airflow-dag-monitor \
-  --from-literal=username=<technical-user> \
-  --from-literal=password=<password> \
-  -n monitoring-datahub-v2
+kubectl exec -it <pod-airflow-webserver> -n <namespace> -- env | grep -i AUTH_BACKEND
+
+kubectl exec -it <pod-airflow-webserver> -n <namespace> -- cat /path/to/airflow.cfg | grep -A2 "\[api\]"
