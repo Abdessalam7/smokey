@@ -1,3 +1,1 @@
-kubectl exec -it <pod-airflow-webserver> -n <namespace> -- env | grep -i AUTH_BACKEND
-
-kubectl exec -it <pod-airflow-webserver> -n <namespace> -- cat /path/to/airflow.cfg | grep -A2 "\[api\]"
+curl -v -u <technical-user>:<password> https://<url-de-l-instance>/api/v1/dags?limit=1
