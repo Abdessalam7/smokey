@@ -1,5 +1,2 @@
-helm get manifest pysmoke-test -n monitoring-datahub-v2 | grep -B5 -A1 ENV_LIST
-kubectl create job --from=cronjob/pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 final-check
-kubectl logs -f job/final-check -n monitoring-datahub-v2
-
-kubectl delete job test verify-fix final-check -n monitoring-datahub-v2 --ignore-not-found
+helm uninstall pysmoke-test -n monitoring-datahub-v2
+helm install pysmoke-test ./pysmoke-ns -n monitoring-datahub-v2
