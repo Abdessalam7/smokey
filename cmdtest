@@ -1,1 +1,9 @@
-curl -v -u <technical-user>:<password> https://<url-de-l-instance>/api/v1/dags?limit=1
+# 1. Valeurs réellement déployées
+helm get values <release> -n <namespace> | grep -A6 "vaultClientCert\|vaultCertRenewal"
+
+# 2. Le cert actuellement dans le secret a-t-il été réémis récemment, et par quelle CA ?
+kubectl get secret pysmoke-test-spark-vault-cert -n <namespace> \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -dates -issuer -subject
+
+# 3. La CA enregistrée dans le rôle cert-auth (celle attendue par Vault)
+vault read -namespace="a101731" auth/cert/certs/pysmoke-test-spark
