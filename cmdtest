@@ -1,2 +1,4 @@
-helm uninstall pysmoke-test -n monitoring-datahub-v2
-helm install pysmoke-test ./pysmoke-ns -n monitoring-datahub-v2
+kubectl create secret generic airflow-dag-monitor \
+  --from-literal=username=<technical-user> \
+  --from-literal=password=<password> \
+  -n monitoring-datahub-v2
