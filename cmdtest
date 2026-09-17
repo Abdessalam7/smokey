@@ -1,5 +1,9 @@
-cd scripts
-python3 -c "
-from spark.spark_auth import get_spark_token
-print(get_spark_token('hprd'))
-"
+kubectl create job --from=cronjob/<nom-du-cronjob-spark> debug-spark \
+  -n monitoring-datahub-v2 --dry-run=client -o yaml > /tmp/debug-job.yaml
+
+
+command: ["sleep", "3600"]
+
+kubectl apply -f /tmp/debug-job.yaml
+
+kubectl exec -it job/debug-spark -n monitoring-datahub-v2 -- sh
