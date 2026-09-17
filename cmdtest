@@ -1,7 +1,3 @@
-kubectl get cronjob pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 -o yaml | grep -A1 ENV_LIST
+kubectl get cronjob -n monitoring-datahub-v2
 
-grep -n "ENV_LIST" -A1 pysmoke-ns/values.yaml
-
-
-
-grep -n "Values\." pysmoke-ns/templates/cronjob-spark.yaml | grep -i env
+kubectl get cronjob pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 -o jsonpath='{.metadata.annotations}'
