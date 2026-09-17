@@ -1,4 +1,1 @@
-helm get values pysmoke-test -n monitoring-datahub-v2 | grep -A6 "^spark:"
-helm upgrade --install pysmoke-test ./pysmoke-ns -n monitoring-datahub-v2
-helm get manifest pysmoke-test -n monitoring-datahub-v2 | grep -B5 -A1 ENV_LIST
-grep -c "pprod,prod" pysmoke-ns/values.yaml
+python3 -c "import yaml; print(yaml.safe_load(open('pysmoke-ns/values.yaml'))['spark']['env'])"
