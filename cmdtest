@@ -1,5 +1,3 @@
-vault write -namespace="a101731" auth/cert/certs/pysmoke-test-spark \
-  display_name=pysmoke-test-spark \
-  policies=pysmoke-test-spark,pysmoke-spark-pki-issue \
-  allowed_common_names=pysmoke-test-spark.data.cloud.net.intra \
-  certificate=@/tmp/ca.pem
+kubectl exec -it <pod-spark> -n monitoring-datahub-v2 -- curl -v --max-time 15 \
+  https://spark-cp-hprd.data.cloud.net.intra/api/spark/v1/instances \
+  -H "Authorization: Bearer $TOKEN"
