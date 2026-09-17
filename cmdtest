@@ -1,1 +1,4 @@
-python3 -c "import yaml; print(yaml.safe_load(open('pysmoke-ns/values.yaml'))['spark']['env'])"
+alias | grep -i helm
+type helm
+ls -la pysmoke-ns/values.yaml
+kubectl config current-context
