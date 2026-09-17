@@ -1,6 +1,27 @@
+# 1. Écrire le mot de passe dans un fichier via un heredoc à délimiteur quoté
+#    ('EOF' entre guillemets simples = aucune interprétation du contenu, $ ` \ ! passent tels quels)
+cat > /tmp/smtp_password.raw <<'EOF'
+colle-le-mot-de-passe-ici
+EOF
+
+# 2. Retirer le retour à la ligne final que le heredoc ajoute toujours
+printf '%s' "$(cat /tmp/smtp_password.raw)" > /tmp/smtp_password.txt
+rm /tmp/smtp_password.raw
+
+# 3. Vérifier qu'il n'y a pas de retour à la ligne parasite à la fin du fichier
+xxd /tmp/smtp_password.txt | tail -3
+# → ne doit PAS finir par "0a" (saut de ligne) après le dernier caractère du mot de passe
+
+# 4. Créer le secret
 kubectl create secret generic smtp-credentials -n monitoring-datahub-v2 \
   --from-literal=host=smtp-appli-ema.staging.echonet.net.intra \
   --from-literal=port=25 \
   --from-literal=user=emanp.group.datahubv2@noprod.bnpparibas.com \
-  --from-literal=password=<valeur du champ password dans Vault> \
+  --from-file=password=/tmp/smtp_password.txt \
   --from-literal=sender=emanp.group.datahubv2@noprod.bnpparibas.com
+
+# 5. Nettoyer le fichier en clair
+rm /tmp/smtp_password.txt
+
+# 6. Vérifier que la valeur stockée correspond bien (relis-la, compare visuellement)
+kubectl get secret smtp-credentials -n monitoring-datahub-v2 -o jsonpath='{.data.password}' | base64 -d | xxd | tail -3
