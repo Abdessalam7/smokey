@@ -1,4 +1,3 @@
-alias | grep -i helm
-type helm
-ls -la pysmoke-ns/values.yaml
-kubectl config current-context
+helm template ./pysmoke-ns -n monitoring-datahub-v2 | grep -B5 -A1 ENV_LIST
+
+helm history pysmoke-test -n monitoring-datahub-v2
