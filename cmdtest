@@ -1,9 +1,26 @@
-# 1. Valeurs réellement déployées
-helm get values <release> -n <namespace> | grep -A6 "vaultClientCert\|vaultCertRenewal"
+# 1. Sauve le cert enregistré dans le rôle Vault (copie le bloc PEM affiché par `vault read`) dans un fichier :
+vim /tmp/registered_ca.pem   # colle le bloc BEGIN/END CERTIFICATE affiché
 
-# 2. Le cert actuellement dans le secret a-t-il été réémis récemment, et par quelle CA ?
-kubectl get secret pysmoke-test-spark-vault-cert -n <namespace> \
-  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -dates -issuer -subject
+openssl x509 -in /tmp/registered_ca.pem -noout -subject -issuer -dates -fingerprint
 
-# 3. La CA enregistrée dans le rôle cert-auth (celle attendue par Vault)
-vault read -namespace="a101731" auth/cert/certs/pysmoke-test-spark
+# 2. Compare avec la CA qui a réellement signé le cert vivant du secret
+kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
+  -o jsonpath='{.data.ca\.crt}' | base64 -d | openssl x509 -noout -subject -issuer -dates -fingerprint
+
+
+
+
+
+
+
+kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
+  -o jsonpath='{.data.ca\.crt}' | base64 -d > /tmp/ca.pem
+
+vault write -namespace="a101731" auth/cert/certs/pysmoke-test-spark \
+  display_name=pysmoke-test-spark \
+  policies=pysmoke-test-spark,pysmoke-spark-pki-issue \
+  allowed_common_names=pysmoke-test-spark.data.cloud.net.intra \
+  certificate=@/tmp/ca.pem
+```//garde `pysmoke-spark-pki-issue` dans policies, il est déjà là pour le renouvellement.
+
+Peux-tu lancer les 2 commandes de comparaison (étape 1 et 2) et me confirmer que les fingerprints diffèrent, avant qu'on applique la correction ?
