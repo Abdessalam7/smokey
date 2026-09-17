@@ -1,1 +1,2 @@
-vault read -namespace="a101731" pkis/pysmoke-test/roles/pysmoke-spark
+kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -text | grep -A3 -E "Key Usage|Extended Key Usage|Basic Constraints"
