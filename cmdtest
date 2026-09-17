@@ -1,7 +1,9 @@
-vault read -namespace="a101731" -field=certificate pkis/pysmoke-test/cert/ca > /tmp/vault_pki_ca.pem
+kubectl delete secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 --ignore-not-found
 
-vault write -namespace="a101731" auth/cert/certs/pysmoke-test-spark \
-  display_name=pysmoke-test-spark \
-  policies=pysmoke-test-spark,pysmoke-spark-pki-issue \
-  allowed_common_names=pysmoke-test-spark.data.cloud.net.intra \
-  certificate=@/tmp/vault_pki_ca.pem
+kubectl create secret generic pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
+  --from-literal=tls.crt="$(jq -r '.data.certificate' /tmp/issued.json)" \
+  --from-literal=tls.key="$(jq -r '.data.private_key' /tmp/issued.json)" \
+  --from-literal=ca.crt="$(jq -r '.data.issuing_ca' /tmp/issued.json)"
+
+# Vérifie qu'il n'y a plus d'ownerReference cette fois :
+kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 -o jsonpath='{.metadata.ownerReferences}'
