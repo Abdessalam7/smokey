@@ -1,12 +1,3 @@
-kubectl create job --from=cronjob/<nom-du-cronjob-spark> debug-spark \
-  -n monitoring-datahub-v2 --dry-run=client -o yaml > /tmp/debug-job.yaml
+kubectl get cronjob pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 -o yaml | grep -A1 ENV_LIST
 
-
-command: ["sleep", "3600"]
-
-kubectl apply -f /tmp/debug-job.yaml
-
-kubectl exec -it job/debug-spark -n monitoring-datahub-v2 -- sh
-
-curl -v --max-time 15 https://spark-cp-hprd.data.cloud.net.intra/api/spark/v1/instances \
-  -H "Authorization: Bearer $TOKEN"
+grep -n "ENV_LIST" -A1 pysmoke-ns/values.yaml
