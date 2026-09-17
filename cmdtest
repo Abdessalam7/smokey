@@ -1,1 +1,1 @@
-kubectl get certificate -n monitoring-datahub-v2 -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.secretName}{"\t"}{.spec.usages}{"\n"}{end}'
+vault read -namespace="a101731" pkis/pysmoke-test/roles/pysmoke-spark
