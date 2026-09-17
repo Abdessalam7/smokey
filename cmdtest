@@ -1,3 +1,4 @@
-kubectl get cronjob -n monitoring-datahub-v2
+kubectl get cronjob pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 -o yaml | grep -A1 ENV_LIST
 
-kubectl get cronjob pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 -o jsonpath='{.metadata.annotations}'
+kubectl create job --from=cronjob/pysmoke-test-pysmoke-spark -n monitoring-datahub-v2 verify-fix
+kubectl logs -f job/verify-fix -n monitoring-datahub-v2
