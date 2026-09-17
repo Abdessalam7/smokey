@@ -1,9 +1,6 @@
-kubectl delete secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 --ignore-not-found
-
-kubectl create secret generic pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 \
-  --from-literal=tls.crt="$(jq -r '.data.certificate' /tmp/issued.json)" \
-  --from-literal=tls.key="$(jq -r '.data.private_key' /tmp/issued.json)" \
-  --from-literal=ca.crt="$(jq -r '.data.issuing_ca' /tmp/issued.json)"
-
-# Vérifie qu'il n'y a plus d'ownerReference cette fois :
-kubectl get secret pysmoke-test-spark-vault-cert -n monitoring-datahub-v2 -o jsonpath='{.metadata.ownerReferences}'
+kubectl create secret generic smtp-credentials -n monitoring-datahub-v2 \
+  --from-literal=host=smtp-appli-ema.staging.echonet.net.intra \
+  --from-literal=port=25 \
+  --from-literal=user=emanp.group.datahubv2@noprod.bnpparibas.com \
+  --from-literal=password=<valeur du champ password dans Vault> \
+  --from-literal=sender=emanp.group.datahubv2@noprod.bnpparibas.com
